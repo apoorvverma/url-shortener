@@ -17,7 +17,7 @@
                     }
 
                     for (const url of data) {
-                        document.getElementById('urls').innerHTML += `<a href="http://localhost:3000/${url.short_code}?deviceId=${deviceId}" target="blank" class="hoverable" style="text-decoration: none; color: black; margin: 10px; padding: 20px; background-color: #fff; border-radius: 5px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); display: flex; justify-content: space-between; align-items: center;"><span>http://localhost:3000/${url.short_code}</span><span style="color: lightgray; font-size: 14px; margin-left: 16px;">${url.url}</span></a>`;
+                        document.getElementById('urls').innerHTML += `<a href="http://localhost:${process.env.PORT || 3000}/${url.short_code}?deviceId=${deviceId}" target="blank" class="hoverable" style="text-decoration: none; color: black; margin: 10px; padding: 20px; background-color: #fff; border-radius: 5px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); display: flex; justify-content: space-between; align-items: center;"><span>http://localhost:${process.env.PORT || 3000}/${url.short_code}</span><span style="color: lightgray; font-size: 14px; margin-left: 16px;">${url.url}</span></a>`;
                     }
                 });
             }
