@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+    <head>
+        <title>URL Shortener | Home</title>
+        <script>
+            function getUrls() {
+                document.getElementById('urls').innerHTML = '';
+                const deviceId = document.getElementById('deviceId').value;
+
+                fetch('/urls', {
+                    method: 'GET',
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.length === 0) {
+                        document.getElementById('urls').innerHTML = 'No shortened URLs exist yet.';
+                    }
+
+                    for (const url of data) {
+                        document.getElementById('urls').innerHTML += `<a href="http://localhost:3000/${url.short_code}?deviceId=${deviceId}" target="blank" class="hoverable" style="text-decoration: none; color: black; margin: 10px; padding: 20px; background-color: #fff; border-radius: 5px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); display: flex; justify-content: space-between; align-items: center;"><span>http://localhost:3000/${url.short_code}</span><span style="color: lightgray; font-size: 14px; margin-left: 16px;">${url.url}</span></a>`;
+                    }
+                });
+            }
+
+            function shortenUrl() {
+                const url = document.getElementById('url').value;
+                fetch('/shorten', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ url }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('result').innerHTML = data.shortUrl;
+                    getUrls();
+                })
+                .catch(error => {
+                    document.getElementById('error').innerHTML = error.message;
+                });
+            }
+        </script>
+        <style>
+            .hoverable:hover {
+            transform: scale(1.01);
+            }
+        </style>
+    </head>
+
+    <body style="background-color: #f0f0f0; font-family: system-ui, sans-serif; max-width: 1000px; margin: 0 auto; text-align: center;">
+        <h1>Enter a URL to shorten:</h1>
+        <input id="url" name="url" placeholder="https://example.com">
+        <button onclick="shortenUrl()">Shorten</button>
+        <p id="result" style="color: darkgreen;"></p>
+        <p id="error" style="color: darkred;"></p>
+        <div id="urls" style="margin-top: 20px; display:flex; flex-direction: column;"></div>
+        <input type="hidden" id="deviceId" name="deviceId" value="">
+    </body>
+
+    <script>
+        document.getElementById('deviceId').value = Math.random().toString(36).substring(2, 8);
+        getUrls();
+    </script>
+</html>

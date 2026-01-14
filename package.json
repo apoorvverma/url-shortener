@@ -1,0 +1,11 @@
+{
+  "name": "url-shortener",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^5.2.1",
+    "sqlite3": "^5.1.6"
+  }
+}
