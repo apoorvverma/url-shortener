@@ -1,0 +1,76 @@
+<!doctype html>
+<html>
+  <head>
+    <title>URL Shortener | Home</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script>
+      function getUrls() {
+        const urlsDiv = document.getElementById('urls');
+        urlsDiv.innerHTML = '';
+        const deviceId = document.getElementById('deviceId').value;
+        const origin = window.location.origin;
+
+        fetch('/urls', { method: 'GET' })
+          .then((response) => response.json())
+          .then((data) => {
+            if (!Array.isArray(data) || data.length === 0) {
+              urlsDiv.innerHTML = 'No shortened URLs exist yet.';
+              return;
+            }
+
+            for (const url of data) {
+              const shortHref = `${origin}/${url.short_code}?deviceId=${deviceId}`;
+              const shortDisplay = `${origin}/${url.short_code}`;
+              urlsDiv.innerHTML += `
+                <a href="${shortHref}" target="_blank" class="hoverable" style="text-decoration: none; color: black; margin: 10px; padding: 20px; background-color: #fff; border-radius: 5px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); display: flex; justify-content: space-between; align-items: center;">
+                  <span>${shortDisplay}</span>
+                  <span style="color: lightgray; font-size: 14px; margin-left: 16px;">${url.url}</span>
+                </a>`;
+            }
+          })
+          .catch((err) => {
+            document.getElementById('error').textContent = err.message || 'Failed to load URLs';
+          });
+      }
+
+      function shortenUrl() {
+        const url = document.getElementById('url').value;
+        const origin = window.location.origin;
+        fetch('/shorten', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            const shortUrl = data.shortUrl || `${origin}/${data.shortCode}`;
+            document.getElementById('result').textContent = shortUrl;
+            getUrls();
+          })
+          .catch((error) => {
+            document.getElementById('error').textContent = error.message || 'Failed to shorten URL';
+          });
+      }
+    </script>
+    <style>
+      .hoverable:hover { transform: scale(1.01); }
+      body { background-color: #f0f0f0; font-family: system-ui, sans-serif; max-width: 1000px; margin: 0 auto; text-align: center; }
+      #urls { margin-top: 20px; display: flex; flex-direction: column; }
+    </style>
+  </head>
+  <body>
+    <h1>Enter a URL to shorten:</h1>
+    <input id="url" name="url" placeholder="https://example.com" />
+    <button onclick="shortenUrl()">Shorten</button>
+    <p id="result" style="color: darkgreen;"></p>
+    <p id="error" style="color: darkred;"></p>
+    <div id="urls"></div>
+    <input type="hidden" id="deviceId" name="deviceId" value="" />
+
+    <script>
+      document.getElementById('deviceId').value = Math.random().toString(36).substring(2, 8);
+      getUrls();
+    </script>
+  </body>
+</html>
