@@ -53,13 +53,19 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ url }),
         })
-          .then((response) => response.json())
-          .then((data) => {
-            const shortUrl = data.shortUrl || `${origin}/${data.shortCode}`;
+          .then(async (response) => {
+            const data = await response.json().catch(() => null);
+            if (!response.ok) {
+              const msg = data && data.error ? data.error : 'Failed to shorten URL';
+              throw new Error(msg);
+            }
+            const shortUrl = (data && data.shortUrl) ? data.shortUrl : `${origin}/${data.shortCode}`;
             document.getElementById('result').textContent = shortUrl;
+            document.getElementById('error').textContent = '';
             getUrls();
           })
           .catch((error) => {
+            document.getElementById('result').textContent = '';
             document.getElementById('error').textContent = error.message || 'Failed to shorten URL';
           });
       }
