@@ -13,7 +13,7 @@ router.get('/:shortCode', (req, res) => {
       return res.status(404).json({ error: 'Short URL not found' });
     }
 
-    db.run('UPDATE urls SET visits = ? WHERE short_code = ?', [Number(row.visits || 0) + 1, shortCode]);
+    db.run('UPDATE urls SET visits = visits + 1, updated_at = ? WHERE short_code = ?', [new Date().toISOString(), shortCode]);
     db.run('INSERT INTO urls_visits (device_id, short_code, created_at) VALUES (?,?,?)', [deviceId || null, shortCode, Date.now()]);
 
     res.redirect(row.url);
