@@ -2,31 +2,42 @@
 <html>
   <head>
     <title>URL Shortener | Home</title>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script>
       function getUrls() {
-        const urlsDiv = document.getElementById('urls');
-        urlsDiv.innerHTML = '';
+        document.getElementById('urls').innerHTML = '';
         const deviceId = document.getElementById('deviceId').value;
-        const origin = window.location.origin;
 
         fetch('/urls', { method: 'GET' })
           .then((response) => response.json())
           .then((data) => {
             if (!Array.isArray(data) || data.length === 0) {
-              urlsDiv.innerHTML = 'No shortened URLs exist yet.';
+              document.getElementById('urls').innerHTML = 'No shortened URLs exist yet.';
               return;
             }
 
+            const container = document.getElementById('urls');
+            
             for (const url of data) {
-              const shortHref = `${origin}/${url.short_code}?deviceId=${deviceId}`;
-              const shortDisplay = `${origin}/${url.short_code}`;
-              urlsDiv.innerHTML += `
-                <a href="${shortHref}" target="_blank" class="hoverable" style="text-decoration: none; color: black; margin: 10px; padding: 20px; background-color: #fff; border-radius: 5px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); display: flex; justify-content: space-between; align-items: center;">
-                  <span>${shortDisplay}</span>
-                  <span style="color: lightgray; font-size: 14px; margin-left: 16px;">${url.url}</span>
-                </a>`;
+                const link = document.createElement('a');
+                
+                const origin = window.location.origin;
+                link.href = `${origin}/${url.short_code}?deviceId=${deviceId}`;
+
+                link.target = "_blank";
+                link.className = "hoverable";
+
+                link.style.cssText = "text-decoration: none; color: black; margin: 10px; padding: 20px; background-color: #fff; border-radius: 5px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); display: flex; justify-content: space-between; align-items: center;";
+
+                const shortSpan = document.createElement('span');
+                shortSpan.textContent = `${origin}/${url.short_code}`;
+
+                const originalSpan = document.createElement('span');
+                originalSpan.style.cssText = "color: lightgray; font-size: 14px; margin-left: 16px;";
+                originalSpan.textContent = url.url;
+
+                link.appendChild(shortSpan);
+                link.appendChild(originalSpan);
+                container.appendChild(link);
             }
           })
           .catch((err) => {
