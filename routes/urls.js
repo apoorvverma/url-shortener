@@ -1,5 +1,6 @@
 const express = require('express');
 const db = require('../db');
+const crypto = require('crypto');
 
 const router = express.Router();
 
@@ -37,13 +38,30 @@ router.post('/shorten', (req, res) => {
     return res.status(400).json({ error: 'Invalid URL. Only http(s) URLs are allowed.' });
   }
 
-  const shortCode = Math.random().toString(36).substring(2, 8);
+  const createdAt = new Date().toISOString();
+  const maxAttempts = 3;
 
-  db.run('INSERT INTO urls (short_code, url, visits, created_at, updated_at) VALUES (?, ?, 0, ?, ?)', [shortCode, url, new Date().toISOString(), new Date().toISOString()], (err) => {
-    if (err) return res.status(500).json({ error: 'Failed to create short url' });
-    const shortUrl = `${req.protocol}://${req.get('host')}/${shortCode}`;
-    res.json({ shortCode, shortUrl });
-  });
+  function tryInsert(attempt = 1) {
+    const shortCode = crypto.randomBytes(5).toString('base64url').slice(0, 7);
+    
+    db.run(
+      'INSERT INTO urls (short_code, url, visits, created_at, updated_at) VALUES (?, ?, 0, ?, ?)',
+      [shortCode, url, createdAt, createdAt],
+      (err) => {
+        if (err) {
+
+          if (attempt < maxAttempts) {
+            return tryInsert(attempt + 1);
+          }
+          return res.status(500).json({ error: 'Failed to create short url' });
+        }
+        const shortUrl = `${req.protocol}://${req.get('host')}/${shortCode}`;
+        res.json({ shortCode, shortUrl });
+      }
+    );
+  }
+
+  tryInsert();
 });
 
 module.exports = router;
