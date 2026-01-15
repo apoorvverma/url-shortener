@@ -22,6 +22,13 @@ router.get('/urls', (req, res) => {
   });
 });
 
+router.get('/urls/visits', (req, res) => {
+  db.all('SELECT * FROM urls_visits', (err, rows) => {
+    if (err) return res.status(500).json({ error: 'Failed to fetch url visits' });
+    res.json(rows);
+  });
+});
+
 // Create short URL
 router.post('/shorten', (req, res) => {
   const { url } = req.body;
@@ -32,7 +39,7 @@ router.post('/shorten', (req, res) => {
 
   const shortCode = Math.random().toString(36).substring(2, 8);
 
-  db.run('INSERT INTO urls (short_code, url, visits) VALUES (?, ?, 0)', [shortCode, url], (err) => {
+  db.run('INSERT INTO urls (short_code, url, visits, created_at, updated_at) VALUES (?, ?, 0, ?, ?)', [shortCode, url, new Date().toISOString(), new Date().toISOString()], (err) => {
     if (err) return res.status(500).json({ error: 'Failed to create short url' });
     const shortUrl = `${req.protocol}://${req.get('host')}/${shortCode}`;
     res.json({ shortCode, shortUrl });
