@@ -28,7 +28,7 @@ db.serialize(() => {
 });
 
 // for existing dbs 
-db.run("ALTER TABLE urls ADD COLUMN normalized_url TEXT", (err) => {
+db.run("ALTER TABLE urls ADD COLUMN normalized_url TEXT", (_err) => {
   // console.info("normalized_url column already exists");
 });
 
@@ -36,10 +36,10 @@ db.run("ALTER TABLE urls ADD COLUMN normalized_url TEXT", (err) => {
 db.run('CREATE UNIQUE INDEX IF NOT EXISTS idx_urls_normalized_url ON urls(normalized_url)');
 
 // for existing dbs 
-db.run('ALTER TABLE urls_visits ADD COLUMN visit_count INTEGER', (err) => {
+db.run('ALTER TABLE urls_visits ADD COLUMN visit_count INTEGER', (_err) => {
   // console.info("visit_count column already exists");
 });
-db.run('ALTER TABLE urls_visits ADD COLUMN updated_at TEXT', (err) => {
+db.run('ALTER TABLE urls_visits ADD COLUMN updated_at TEXT', (_err) => {
   // console.info("updated_at column already exists");
 });
 
