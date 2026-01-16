@@ -17,6 +17,7 @@ Simple URL shortener with an Express API, SQLite storage, and per-device visit t
 Visit http://localhost:3000 to use the UI.
 
 ## Scripts
+
 - `npm run dev` – start server in watch mode
 - `npm start` – start server
 - `npm run lint` – run ESLint
@@ -25,6 +26,7 @@ Visit http://localhost:3000 to use the UI.
 - `npm run format:fix` – write Prettier formatting
 
 ## Project Structure
+
 - `server.js` – app bootstrap, middleware, static serving, route mounting
 - `routes/` – API routes (`/shorten`, `/urls`, `/urls/visits`, redirect `/:shortCode`)
 - `db/` – SQLite initialization and schema setup
@@ -43,15 +45,18 @@ Visit http://localhost:3000 to use the UI.
 See full schema in `docs/openapi.yaml`.
 
 ## Behavior
+
 - Short codes: random, 6–7 URL-safe chars; collision retries applied
 - Idempotency: same normalized URL returns the same short code (normalize = lowercase scheme/host, drop fragment)
 - Visit tracking: total visits per URL; per-device visit counts keyed by `visitor_id` cookie
 
 ## Development
+
 - Linting: ESLint flat config (`eslint.config.cjs`) with jsdoc & node plugins
 - Formatting: Prettier (`.prettierrc.json`)
 - Types: JSDoc typedefs in `types.js`; key helpers and routes are documented
 
 ## Notes
+
 - SQLite DB is created in the project root by default (urls.db). Override path via `DB_PATH`.
 - Static frontend is served from `/public`.

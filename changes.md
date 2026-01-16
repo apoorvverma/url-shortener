@@ -7,7 +7,16 @@ All the issues I found and fixed:
 5. Added a new route to get rows from the urls_visits table (commit 0.06).
 6. Displaying errors in the UI (commit 0.07).
 
-Some more changes I would've done:
+Changes I made for the Major issues noted:
 
-1. Add tests using Jest and test cases for the server routes.
-2. The current logic for device_id for tracking device visits is not reliable and isn’t actually a device identifier. It could be improved by using a better method like cookies. This would ensure that the same device is tracked consistently.
+1. Significantly reduced the chances of short_code collision by using better randomization than Math.random() (commit 0.09).
+2. Implemented URL normalization by adding a column and a Unique Index to the urls table to avoid the same URL being shortened multiple times (commit 0.10).
+3. Refactored device tracking by using cookies and assigning an id to the device (browser profile to be more specific) (commit 0.11).
+
+Other Changes:
+
+1. Added linting and formatting to the codebase (commit 0.12).
+2. Added API documentation and a developer-friendly README with clear setup steps (commit 0.14).
+3. Added JSDoc comments and shared typedefs for the key modules (commit 0.15).
+4. Added a .env.example file to the project root (commit 0.14).
+5. Updated prompts.md with a few more prompts (commit 0.16).
