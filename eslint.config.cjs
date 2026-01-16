@@ -4,7 +4,7 @@ const nodePlugin = require('eslint-plugin-node');
 
 module.exports = [
   {
-    ignores: ['node_modules/', 'coverage/', 'urls.db']
+    ignores: ['node_modules/', 'coverage/', 'urls.db'],
   },
   js.configs.recommended,
   {

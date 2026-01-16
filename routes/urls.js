@@ -23,7 +23,6 @@ function normalizeUrlMinimal(input) {
   return u.toString();
 }
 
-
 // Get all URLs
 router.get('/urls', (req, res) => {
   db.all('SELECT * FROM urls', (err, rows) => {
@@ -53,26 +52,30 @@ router.post('/shorten', (req, res) => {
 
   function tryInsert(attempt = 1) {
     const shortCode = crypto.randomBytes(5).toString('base64url').slice(0, 7);
-    
+
     db.run(
       'INSERT INTO urls (short_code, url, normalized_url, visits, created_at, updated_at) VALUES (?, ?, ?, 0, ?, ?)',
       [shortCode, url, normalized, createdAt, createdAt],
       (err) => {
         if (err) {
-          const msg = String(err && err.message || '');
+          const msg = String((err && err.message) || '');
           const isConstraint = /SQLITE_CONSTRAINT/.test(msg);
           const normalizedConflict = isConstraint && /normalized_url/i.test(msg);
           const shortCodeConflict = isConstraint && /short_code/i.test(msg);
 
           if (normalizedConflict) {
-            return db.get('SELECT short_code FROM urls WHERE normalized_url = ?', [normalized], (selErr, row) => {
-              if (selErr || !row) {
-                return res.status(500).json({ error: 'Failed to fetch existing short url' });
-              }
-              const existingShort = row.short_code;
-              const shortUrl = `${req.protocol}://${req.get('host')}/${existingShort}`;
-              return res.json({ shortCode: existingShort, shortUrl });
-            });
+            return db.get(
+              'SELECT short_code FROM urls WHERE normalized_url = ?',
+              [normalized],
+              (selErr, row) => {
+                if (selErr || !row) {
+                  return res.status(500).json({ error: 'Failed to fetch existing short url' });
+                }
+                const existingShort = row.short_code;
+                const shortUrl = `${req.protocol}://${req.get('host')}/${existingShort}`;
+                return res.json({ shortCode: existingShort, shortUrl });
+              },
+            );
           }
 
           if (shortCodeConflict && attempt < maxAttempts) {
@@ -86,7 +89,7 @@ router.post('/shorten', (req, res) => {
         }
         const shortUrl = `${req.protocol}://${req.get('host')}/${shortCode}`;
         res.json({ shortCode, shortUrl });
-      }
+      },
     );
   }
 

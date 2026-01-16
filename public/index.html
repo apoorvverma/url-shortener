@@ -15,28 +15,29 @@
             }
 
             const container = document.getElementById('urls');
-            
+
             for (const url of data) {
-                const link = document.createElement('a');
-                
-                const origin = window.location.origin;
-                link.href = `${origin}/${url.short_code}`;
+              const link = document.createElement('a');
 
-                link.target = "_blank";
-                link.className = "hoverable";
+              const origin = window.location.origin;
+              link.href = `${origin}/${url.short_code}`;
 
-                link.style.cssText = "text-decoration: none; color: black; margin: 10px; padding: 20px; background-color: #fff; border-radius: 5px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); display: flex; justify-content: space-between; align-items: center;";
+              link.target = '_blank';
+              link.className = 'hoverable';
 
-                const shortSpan = document.createElement('span');
-                shortSpan.textContent = `${origin}/${url.short_code}`;
+              link.style.cssText =
+                'text-decoration: none; color: black; margin: 10px; padding: 20px; background-color: #fff; border-radius: 5px; box-shadow: 0 4px 12px rgba(0,0,0,0.12); display: flex; justify-content: space-between; align-items: center;';
 
-                const originalSpan = document.createElement('span');
-                originalSpan.style.cssText = "color: lightgray; font-size: 14px; margin-left: 16px;";
-                originalSpan.textContent = url.url;
+              const shortSpan = document.createElement('span');
+              shortSpan.textContent = `${origin}/${url.short_code}`;
 
-                link.appendChild(shortSpan);
-                link.appendChild(originalSpan);
-                container.appendChild(link);
+              const originalSpan = document.createElement('span');
+              originalSpan.style.cssText = 'color: lightgray; font-size: 14px; margin-left: 16px;';
+              originalSpan.textContent = url.url;
+
+              link.appendChild(shortSpan);
+              link.appendChild(originalSpan);
+              container.appendChild(link);
             }
           })
           .catch((err) => {
@@ -58,7 +59,7 @@
               const msg = data && data.error ? data.error : 'Failed to shorten URL';
               throw new Error(msg);
             }
-            const shortUrl = (data && data.shortUrl) ? data.shortUrl : `${origin}/${data.shortCode}`;
+            const shortUrl = data && data.shortUrl ? data.shortUrl : `${origin}/${data.shortCode}`;
             document.getElementById('result').textContent = shortUrl;
             document.getElementById('error').textContent = '';
             getUrls();
@@ -70,17 +71,29 @@
       }
     </script>
     <style>
-      .hoverable:hover { transform: scale(1.01); }
-      body { background-color: #f0f0f0; font-family: system-ui, sans-serif; max-width: 1000px; margin: 0 auto; text-align: center; }
-      #urls { margin-top: 20px; display: flex; flex-direction: column; }
+      .hoverable:hover {
+        transform: scale(1.01);
+      }
+      body {
+        background-color: #f0f0f0;
+        font-family: system-ui, sans-serif;
+        max-width: 1000px;
+        margin: 0 auto;
+        text-align: center;
+      }
+      #urls {
+        margin-top: 20px;
+        display: flex;
+        flex-direction: column;
+      }
     </style>
   </head>
   <body>
     <h1>Enter a URL to shorten:</h1>
     <input id="url" name="url" placeholder="https://example.com" />
     <button onclick="shortenUrl()">Shorten</button>
-    <p id="result" style="color: darkgreen;"></p>
-    <p id="error" style="color: darkred;"></p>
+    <p id="result" style="color: darkgreen"></p>
+    <p id="error" style="color: darkred"></p>
     <div id="urls"></div>
 
     <script>

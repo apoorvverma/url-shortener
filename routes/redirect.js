@@ -11,13 +11,12 @@ router.get('/:shortCode', (req, res) => {
   // get or set visitor_id cookie
   let deviceId = req.cookies && req.cookies.visitor_id;
   if (!deviceId) {
-
     deviceId = crypto.randomBytes(5).toString('base64url');
 
     res.cookie('visitor_id', deviceId, {
       httpOnly: true,
       sameSite: 'lax',
-      maxAge: 1000 * 60 * 60 * 24 * 365 // 1 year
+      maxAge: 1000 * 60 * 60 * 24 * 365, // 1 year
     });
   }
 
@@ -26,7 +25,10 @@ router.get('/:shortCode', (req, res) => {
       return res.status(404).json({ error: 'Short URL not found' });
     }
 
-    db.run('UPDATE urls SET visits = visits + 1, updated_at = ? WHERE short_code = ?', [new Date().toISOString(), shortCode]);
+    db.run('UPDATE urls SET visits = visits + 1, updated_at = ? WHERE short_code = ?', [
+      new Date().toISOString(),
+      shortCode,
+    ]);
 
     // Upsert per-device visits
     const nowIso = new Date().toISOString();
@@ -35,7 +37,7 @@ router.get('/:shortCode', (req, res) => {
        VALUES (?,?,?,?,?)
        ON CONFLICT(device_id, short_code)
        DO UPDATE SET visit_count = visit_count + 1, updated_at = excluded.updated_at`,
-      [deviceId, shortCode, 1, nowIso, nowIso]
+      [deviceId, shortCode, 1, nowIso, nowIso],
     );
 
     res.redirect(row.url);
