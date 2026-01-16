@@ -4,7 +4,13 @@ const crypto = require('crypto');
 
 const router = express.Router();
 
-// Redirect to original URL and record visit (cookie-based visitor id)
+/**
+ * Redirect to the original URL and record a visit.
+ * - Uses a cookie-based anonymous `visitor_id` to track per-device metrics.
+ * - Increments total visits on the URL and upserts a per-device visit count.
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
 router.get('/:shortCode', (req, res) => {
   const { shortCode } = req.params;
 

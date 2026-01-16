@@ -4,6 +4,11 @@ const crypto = require('crypto');
 
 const router = express.Router();
 
+/**
+ * Validate that a value is an HTTP(S) URL string.
+ * @param {unknown} value
+ * @returns {boolean}
+ */
 function isValidHttpUrl(value) {
   if (typeof value !== 'string') return false;
   try {
@@ -14,6 +19,11 @@ function isValidHttpUrl(value) {
   }
 }
 
+/**
+ * Minimal, stable normalization: lowercase protocol and host, drop fragment, keep query as-is.
+ * @param {string} input
+ * @returns {string}
+ */
 function normalizeUrlMinimal(input) {
   const u = new URL(input);
   // lowercase; drop fragment; keeping query
@@ -23,7 +33,11 @@ function normalizeUrlMinimal(input) {
   return u.toString();
 }
 
-// Get all URLs
+/**
+ * Get all shortened URLs.
+ * @param {import('express').Request} _req
+ * @param {import('express').Response} res
+ */
 router.get('/urls', (req, res) => {
   db.all('SELECT * FROM urls', (err, rows) => {
     if (err) return res.status(500).json({ error: 'Failed to fetch urls' });
@@ -31,6 +45,11 @@ router.get('/urls', (req, res) => {
   });
 });
 
+/**
+ * Get all per-device visits for URLs.
+ * @param {import('express').Request} _req
+ * @param {import('express').Response} res
+ */
 router.get('/urls/visits', (req, res) => {
   db.all('SELECT * FROM urls_visits', (err, rows) => {
     if (err) return res.status(500).json({ error: 'Failed to fetch url visits' });
@@ -38,7 +57,11 @@ router.get('/urls/visits', (req, res) => {
   });
 });
 
-// Create short URL
+/**
+ * Create a short URL for a given destination URL. Idempotent per normalized_url.
+ * @param {import('express').Request} req
+ * @param {import('express').Response} res
+ */
 router.post('/shorten', (req, res) => {
   const { url } = req.body;
 
