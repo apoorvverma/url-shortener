@@ -1,29 +1,57 @@
 # URL Shortener Service (Node.js/Express)
 
-This is a simple Node.js application with an Express.js API and SQLite DB that allows users to shorten URLs and track them.
+Simple URL shortener with an Express API, SQLite storage, and per-device visit tracking (via cookie).
 
-## Running the Application
+## Getting Started
 
-1. You will need Node.js installed on your machine to run this application.
+- Prerequisites: Node.js 18+
+- Install dependencies:
+  - `npm install`
+- Environment (optional): copy `.env.example` to `.env` and adjust values
+  - `PORT=3000`
+  - `DB_PATH=urls.db`
+- Start the app:
+  - Dev: `npm run dev`
+  - Prod: `npm start`
 
-## Application Requirements
+Visit http://localhost:3000 to use the UI.
 
-1. Users can visit the home page to
-   1. View all shortened URLs
-   2. Click a shortened URL to navigate to it
-   3. Enter a URL to shorten it
-2. We track the total number of visits to every shortened URL
-3. We track every visit to the shortened URLs for every user's device
+## Scripts
+- `npm run dev` – start server in watch mode
+- `npm start` – start server
+- `npm run lint` – run ESLint
+- `npm run lint:fix` – fix lint issues
+- `npm run format` – check Prettier formatting
+- `npm run format:fix` – write Prettier formatting
 
-## Your Task
+## Project Structure
+- `server.js` – app bootstrap, middleware, static serving, route mounting
+- `routes/` – API routes (`/shorten`, `/urls`, `/urls/visits`, redirect `/:shortCode`)
+- `db/` – SQLite initialization and schema setup
+- `public/` – static frontend (index.html)
+- `docs/openapi.yaml` – OpenAPI 3 spec for the API
 
-1. Fix any issues you find with this application. Please provide a description of all the issues you find and describe your fix. If you don't fix something due to time constraints, please explain how you might fix it if you had more time.
-2. Improve the developer experience of this code base.
+## API Endpoints
 
-For both tasks, please feel free to change **anything** and everything you want other than the Application Requirements listed above.
+- `GET /urls` – list all URL mappings
+- `GET /urls/visits` – list per-device visit rows
+- `POST /shorten` – create or return a short URL
+  - body: `{ "url": "https://example.com" }`
+  - returns: `{ shortCode, shortUrl }`
+- `GET /:shortCode` – redirect to the original URL and record a visit
 
-### Rules
+See full schema in `docs/openapi.yaml`.
 
-- Please use git. Please make an initial commit immediately with the content of the repo as-is.
-- You may use AI, but please submit your prompts in a `prompts.md` file. Also, please includes which model & tool you prompted (e.g. ChatGPT on web, Composer 1 on Cursor CLI, etc.)
-- You may ask as many clarifying questions as needed, but please note that they will be answered by a non-technical product manager.
+## Behavior
+- Short codes: random, 6–7 URL-safe chars; collision retries applied
+- Idempotency: same normalized URL returns the same short code (normalize = lowercase scheme/host, drop fragment)
+- Visit tracking: total visits per URL; per-device visit counts keyed by `visitor_id` cookie
+
+## Development
+- Linting: ESLint flat config (`eslint.config.cjs`) with jsdoc & node plugins
+- Formatting: Prettier (`.prettierrc.json`)
+- Types: JSDoc typedefs in `types.js`; key helpers and routes are documented
+
+## Notes
+- SQLite DB is created in the project root by default (urls.db). Override path via `DB_PATH`.
+- Static frontend is served from `/public`.

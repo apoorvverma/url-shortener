@@ -1,0 +1,121 @@
+openapi: 3.0.3
+info:
+  title: URL Shortener API
+  version: 1.0.0
+  description: Simple URL shortener service with visit tracking.
+servers:
+  - url: http://localhost:3000
+paths:
+  /urls:
+    get:
+      summary: List all shortened URLs
+      responses:
+        '200':
+          description: Array of URL rows
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UrlRow'
+  /urls/visits:
+    get:
+      summary: List per-device visit rows
+      responses:
+        '200':
+          description: Array of visit rows
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UrlVisitRow'
+  /shorten:
+    post:
+      summary: Create or return a short URL mapping
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                  example: https://example.com
+      responses:
+        '200':
+          description: Short URL created or returned from existing mapping
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  shortCode:
+                    type: string
+                    example: abc123
+                  shortUrl:
+                    type: string
+                    example: http://localhost:3000/abc123
+        '400':
+          description: Invalid URL
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  '/{shortCode}':
+    get:
+      summary: Redirect to original URL and record a visit
+      parameters:
+        - in: path
+          name: shortCode
+          required: true
+          schema:
+            type: string
+      responses:
+        '302':
+          description: Redirect to original URL
+        '404':
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    UrlRow:
+      type: object
+      properties:
+        short_code:
+          type: string
+        url:
+          type: string
+        normalized_url:
+          type: string
+          nullable: true
+        visits:
+          type: integer
+        created_at:
+          type: string
+        updated_at:
+          type: string
+    UrlVisitRow:
+      type: object
+      properties:
+        id:
+          type: integer
+        device_id:
+          type: string
+        short_code:
+          type: string
+        visit_count:
+          type: integer
+        created_at:
+          type: string
+        updated_at:
+          type: string
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
